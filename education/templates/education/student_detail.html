@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}学生详情{% endblock %}
+
+{% block content %}
+    <h1>学生详情</h1>
+    <!-- 登录状态提示 -->
+    {% if user.is_authenticated %}
+        <p>欢迎，{{ user.username }}！ <a href="{% url 'education:logout' %}">退出登录</a></p>
+    {% else %}
+        <a href="{% url 'education:login' %}">登录</a> | 
+        <a href="{% url 'education:register' %}">注册</a>
+    {% endif %}
+    <div style="margin-top: 20px; background: white; padding: 20px; border-radius: 5px;">
+        <h2>{{ student.name }} 同学的详细信息</h2>
+        <p>性别：{{ student.get_gender_display }}</p>
+        <p>邮箱：{{ student.email }}</p>
+        <p>电话：{{ student.mobile }}</p>
+        <p>角色：
+            {% for role in student.roles.all %}
+                {{ role.name }}<br>
+            {% empty %}
+                无角色
+            {% endfor %}
+        </p>
+    </div>
+
+    <!-- 新增密码修改表单 -->
+    <div style="margin-top: 20px; background: white; padding: 20px; border-radius: 5px;">
+        <h2>修改密码</h2>
+        <form method="post" action="{% url 'education:change_password' %}">
+            {% csrf_token %}
+            {{ password_form.as_p }}
+            <button type="submit">修改密码</button>
+            {% if messages %}
+                {% for message in messages %}
+                    <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        </form>
+    </div>
+{% endblock %}

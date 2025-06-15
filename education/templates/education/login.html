@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>登录</title>
+</head>
+<body>
+    <h1>用户登录</h1>
+    <!-- 新增消息显示区域 -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">登录</button>
+    </form>
+    <p>还没有账号？<a href="{% url 'education:register' %}">立即注册</a></p>
+</body>
+</html>

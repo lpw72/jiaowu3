@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}学生列表{% endblock %}
+
+{% block content %}
+    <h1>学生列表</h1>
+    <!-- 登录状态提示 -->
+    {% if user.is_authenticated %}
+        <p>欢迎，{{ user.username }}！ <a href="{% url 'education:logout' %}">退出登录</a></p>
+    {% else %}
+        <a href="{% url 'education:login' %}">登录</a> | 
+        <a href="{% url 'education:register' %}">注册</a>
+    {% endif %}
+    <a href="{% url 'education:student_create' %}">新增学生</a>
+    <table border="1" style="width: 100%; margin-top: 20px; background: white; border-collapse: collapse;">
+        <tr>
+            <th>姓名</th>
+            <th>性别</th>
+            <th>邮箱</th>
+            <th>电话</th>
+            <th>角色</th>
+            <th>操作</th>
+        </tr>
+        {% for student in students %}
+        <tr>
+            <td>{{ student.name }}</td>
+            <td>{{ student.get_gender_display }}</td>
+            <td>{{ student.email }}</td>
+            <td>{{ student.mobile }}</td>  
+            <td>
+                {% for role in student.roles.all %}
+                    {{ role.name }}<br>
+                {% empty %}
+                    无角色
+                {% endfor %}
+            </td>
+            <td>
+                <!-- 使用视图传递的 is_admin 变量判断（已调整为角色名称包含"管理员"） -->
+                {% if is_admin %}
+                    <a href="{% url 'education:student_update' student.pk %}" style="color: #3498db; margin-right: 10px;">编辑</a>
+                    <a href="{% url 'education:student_delete' student.pk %}" 
+                       onclick="return confirm('确定删除该学生？')" 
+                       style="color: #e74c3c;">删除</a>
+                {% else %}
+                    <a href="{% url 'education:student_update' student.pk %}" style="color: #3498db; margin-right: 10px;">编辑</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% if student %}编辑学生{% else %}新增学生{% endif %}</title>
+</head>
+<body>
+    <h1>{% if student %}编辑学生{% else %}新增学生{% endif %}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}  <!-- 自动渲染动态字段（管理员可见角色，非管理员不可见） -->
+        <button type="submit">保存</button>
+        <a href="{% url 'education:student_list' %}">返回列表</a>
+    </form>
+</body>
+</html>

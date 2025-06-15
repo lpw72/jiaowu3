@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}角色列表{% endblock %}
+
+{% block content %}
+    <h1>角色列表</h1>
+    <!-- 登录状态提示 -->
+    {% if user.is_authenticated %}
+        <p>欢迎，{{ user.username }}！ <a href="{% url 'education:logout' %}">退出登录</a></p>
+    {% else %}
+        <a href="{% url 'education:login' %}">登录</a> | 
+        <a href="{% url 'education:register' %}">注册</a>
+    {% endif %}
+    <a href="{% url 'education:role_create' %}">新增角色</a>
+    <table border="1" style="width: 100%; margin-top: 20px; background: white; border-collapse: collapse;">
+        <tr>
+            <th>角色名称</th>
+            <th>对应权限（多个）</th>  <!-- 多权限显示 -->
+            <th>操作</th>
+        </tr>
+        {% for role in roles %}
+        <tr>
+            <td>{{ role.name }}</td>
+            <td>
+                {% for perm in role.permissions.all %}  <!-- 遍历多对多关系 -->
+                    {{ perm.name }}<br>
+                {% empty %}
+                    无权限
+                {% endfor %}
+            </td>
+            <td>
+                <a href="{% url 'education:role_update' role.pk %}">编辑</a>
+                <a href="{% url 'education:role_delete' role.pk %}" onclick="return confirm('确定删除？')">删除</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

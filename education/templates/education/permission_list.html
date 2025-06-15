@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}权限列表{% endblock %}
+
+{% block content %}
+    <h1>权限列表</h1>
+    <!-- 登录状态提示 -->
+    {% if user.is_authenticated %}
+        <p>欢迎，{{ user.username }}！ <a href="{% url 'education:logout' %}">退出登录</a></p>
+    {% else %}
+        <a href="{% url 'education:login' %}">登录</a> | 
+        <a href="{% url 'education:register' %}">注册</a>
+    {% endif %}
+    <a href="{% url 'education:permission_create' %}">新增权限</a>
+    <table border="1" style="width: 100%; margin-top: 20px; background: white; border-collapse: collapse;">
+        <tr>
+            <th>ID</th>
+            <th>权限名称</th>
+            <th>对应代码</th>
+            <th>操作</th>
+        </tr>
+        {% for permission in permissions %}
+        <tr>
+            <td>{{ permission.id }}</td>
+            <td>{{ permission.name }}</td>
+            <td>{{ permission.code }}</td>
+            <td>
+                <a href="{% url 'education:permission_update' permission.pk %}" style="color: #3498db; margin-right: 10px;">编辑</a>
+                <a href="{% url 'education:permission_delete' permission.pk %}" 
+                   onclick="return confirm('确定删除该权限？')" 
+                   style="color: #e74c3c;">删除</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
+

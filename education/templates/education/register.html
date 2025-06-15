@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>用户注册</title>
+</head>
+<body>
+    <h1>教务系统注册</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">注册</button>
+        <p>已有账号？<a href="{% url 'education:login' %}">返回登录</a></p>
+    </form>
+</body>
+</html>
