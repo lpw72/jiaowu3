@@ -5,6 +5,7 @@ from .models import Student
 from .models import Role
 from .models import Permission
 
+
 class StudentForm(forms.ModelForm):
     class Meta:
         model = Student
@@ -20,11 +21,13 @@ class StudentForm(forms.ModelForm):
         if not is_admin:
             del self.fields['roles']
 
+
 class CustomLoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['username'].label = '用户名'
         self.fields['password'].label = '密码'
+
 
 class UserRegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True, label='邮箱')
@@ -35,8 +38,9 @@ class UserRegistrationForm(UserCreationForm):
         max_length=20,
         required=False,
         label='邀请码（选填）',
-    
+
     )
+
     class Meta:
         model = User
         fields = ['username', 'email', 'password1', 'password2', 'gender', 'mobile']
@@ -46,7 +50,7 @@ class UserRegistrationForm(UserCreationForm):
         # 移除密码字段默认帮助文本
         self.fields['password1'].help_text = None
         self.fields['password2'].help_text = None
-        
+
         # 删除用户名提示（原中文提示）
         self.fields['username'].help_text = ''  # 改为空字符串
         self.fields['username'].error_messages = {
@@ -57,8 +61,8 @@ class UserRegistrationForm(UserCreationForm):
 
         # 新增：设置字段中文标签
         self.fields['username'].label = '用户名'  # 原 Username
-        self.fields['password1'].label = '密码'    # 原 Password
-        self.fields['password2'].label = '确认密码' # 原 Password confirmation
+        self.fields['password1'].label = '密码'  # 原 Password
+        self.fields['password2'].label = '确认密码'  # 原 Password confirmation
 
         # 修改密码确认的错误提示（中文）
         self.fields['password2'].error_messages['password_mismatch'] = '两次输入的密码不一致'
@@ -83,6 +87,7 @@ class RoleForm(forms.ModelForm):
             'permissions': forms.CheckboxSelectMultiple(),  # 多选框显示权限
         }
         help_texts = {'permissions': '按住Ctrl键多选权限'}
+
 
 class PermissionForm(forms.ModelForm):
     class Meta:
