@@ -5,13 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="384cef37-6d0a-4deb-912b-4041df08d44f" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/education/serializers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/education/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/education/forms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/education/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/education/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/education/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/education/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/jiaowu/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/jiaowu/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/jiaowu/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/jiaowu/urls.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,26 +32,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Django 服务器.jiaowu.executor": "Run",
-    "Django 服务器.jiaowu2.executor": "Run",
-    "Django 服务器.jiaowu3.executor": "Run",
-    "Python.settings.executor": "Run",
-    "RunOnceActivity.OpenDjangoStructureViewOnStart": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "D:/python/django/jiaowu2",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Django 服务器.jiaowu.executor&quot;: &quot;Run&quot;,
+    &quot;Django 服务器.jiaowu2.executor&quot;: &quot;Run&quot;,
+    &quot;Django 服务器.jiaowu3.executor&quot;: &quot;Run&quot;,
+    &quot;Python.settings.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenDjangoStructureViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/python/django/jiaowu2&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Django 服务器.jiaowu3">
     <configuration name="jiaowu" type="Python.DjangoServer" factoryName="Django server">
       <module name="jiaowu" />
@@ -167,7 +162,8 @@
       <workItem from="1749568269012" duration="1199000" />
       <workItem from="1749651496110" duration="3523000" />
       <workItem from="1749737211190" duration="11582000" />
-      <workItem from="1749997385858" duration="11531000" />
+      <workItem from="1749997385858" duration="12187000" />
+      <workItem from="1750153159341" duration="1525000" />
     </task>
     <servers />
   </component>

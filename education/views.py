@@ -4,6 +4,7 @@ from django.contrib.auth import login, update_session_auth_hash, authenticate,lo
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.contrib.messages import success
 from django.utils.decorators import method_decorator
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated,AllowAny
@@ -77,35 +78,39 @@ def student_delete(request, pk):
 # 用户注册视图
 @api_view(['POST'])
 def register(request):
-    if request.method == 'POST':  # 如果请求方法是POST
-        form = UserRegistrationForm(request.data)  # 使用表单处理请求数据
-        if form.is_valid():  # 如果表单有效
-            invitation_code = form.cleaned_data.get('invitation_code', '')  # 获取邀请码，默认为空字符串
-            user = form.save(commit=False)  # 保存用户但不提交到数据库
-            user.is_staff = (invitation_code == '123456')  # 根据邀请码设置用户是否为管理员
-            user.save()  # 提交用户到数据库
-            gender = form.cleaned_data['gender']  # 获取性别
-            mobile = form.cleaned_data['mobile']  # 获取手机号
+    if request.method == 'POST':
+        form = UserRegistrationForm(request.data)
+        if form.is_valid():
+            invitation_code = form.cleaned_data.get('invitation_code', '')
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password'])  # 设置密码
+            user.is_staff = (invitation_code == '123456')
+            user.save()
+
+            gender = form.cleaned_data['gender']
+            mobile = form.cleaned_data['mobile']
             student = Student.objects.create(
                 name=user.username,
                 gender=gender,
                 mobile=mobile,
                 email=user.email,
-                user=user  # 关联用户对象
-            )  # 创建学生记录并关联用户
-            admin_role, _ = Role.objects.get_or_create(name='管理员')  # 获取或创建管理员角色
-            common_role, _ = Role.objects.get_or_create(name='普通用户')  # 获取或创建普通用户角色
-            if user.is_staff:  # 如果用户是管理员
-                student.roles.add(admin_role)  # 添加管理员角色
-            else:
-                student.roles.add(common_role)  # 添加普通用户角色
-            messages.success(request, '注册成功，请使用账号密码登录！')  # 添加成功消息
-            return Response({'status': 'success', 'data': {'message': 'User registered successfully'}})  # 返回成功的JSON响应
-        else:
-            return Response({'status': 'error', 'data': {'errors': form.errors}}, status=400)  # 返回包含错误信息的JSON响应
-    else:
-        return Response({'status': 'success', 'data': {}})  # 返回空的JSON响应
+                user=user
+            )
 
+            admin_role, _ = Role.objects.get_or_create(name='管理员')
+            common_role, _ = Role.objects.get_or_create(name='普通用户')
+
+            if user.is_staff:
+                student.roles.add(admin_role)
+            else:
+                student.roles.add(common_role)
+
+            success(request, '注册成功，请使用账号密码登录！')
+            return Response({'status': 'success', 'data': {'message': 'User registered successfully'}})
+        else:
+            return Response({'status': 'error', 'data': {'errors': form.errors}}, status=400)
+    else:
+        return Response({'status': 'success', 'data': {}})
 # 自定义登录视图
 class CustomLoginView(APIView):
     permission_classes = [AllowAny]  # 允许任何人访问登录视图
