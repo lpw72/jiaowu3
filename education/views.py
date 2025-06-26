@@ -10,6 +10,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated,AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import status
 from .forms import StudentForm, UserRegistrationForm, PasswordChangeForm,RoleForm,PermissionForm
 from .models import Student, Role, Permission
 from .serializers import StudentSerializer, RoleSerializer, PermissionSerializer
@@ -55,15 +56,18 @@ def student_update(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def student_create(request):
-    current_user = request.user  # 获取当前用户
-    is_admin = hasattr(current_user, 'student') and current_user.student.roles.filter(name__icontains='管理员').exists()  # 检查用户是否为管理员
-    if request.method == 'POST':  # 如果请求方法是POST
-        form = StudentForm(request.data, is_admin=is_admin)  # 使用表单处理请求数据
-        if form.is_valid():  # 如果表单有效
-            form.save()  # 保存表单数据
-            return Response({'status': 'success', 'data': {'message': 'Student created successfully'}})  # 返回成功的JSON响应
+    current_user = request.user
+    is_admin = hasattr(current_user, 'student') and current_user.student.roles.filter(name='管理员').exists()
+    
+    if request.method == 'POST':
+        form = StudentForm(request.data, is_admin=is_admin)
+        if form.is_valid():
+            student = form.save(commit=False)
+            # 确保密码已正确哈希处理（由表单的save方法处理）
+            student.save()
+            return Response({'status': 'success', 'data': {'message': '学生创建成功'}})
         else:
-            return Response({'status': 'error', 'data': {'errors': form.errors}}, status=400)  # 返回包含错误信息的JSON响应
+            return Response({'status': 'error', 'data': {'errors': form.errors}}, status=400)
     else:
         return Response({'status': 'success', 'data': {'is_admin': is_admin}})  # 返回管理员状态的JSON响应
 
@@ -83,7 +87,8 @@ def register(request):
         if form.is_valid():
             invitation_code = form.cleaned_data.get('invitation_code', '')
             user = form.save(commit=False)
-            user.set_password(form.cleaned_data['password'])  # 设置密码
+            # 修复：使用 'password1' 代替 'password'
+            user.set_password(form.cleaned_data['password1'])  # 设置密码
             user.is_staff = (invitation_code == '123456')
             user.save()
 
@@ -113,33 +118,22 @@ def register(request):
         return Response({'status': 'success', 'data': {}})
 # 自定义登录视图
 class CustomLoginView(APIView):
-    permission_classes = [AllowAny]  # 允许任何人访问登录视图
-
-    def post(self, request, *args, **kwargs):
-        try:
-            username = request.data.get('username')  # 获取用户名
-            password = request.data.get('password')  # 获取密码
-
-            if not username or not password:
-                return Response({'status': 'error', 'data': {'message': 'Username and password are required'}}, status=400)
-
-            user = authenticate(username=username, password=password)  # 验证用户凭据
-            if user is not None:
-                login(request, user)  # 登录用户
-                refresh = RefreshToken.for_user(user)  # 生成刷新令牌
-                access_token = str(refresh.access_token)  # 获取访问令牌
-                return Response({
-                    'status': 'success',
-                    'data': {
-                        'message': 'Login successful',
-                        'access_token': access_token,
-                        'refresh_token': str(refresh)
-                    }
-                })
-            else:
-                return Response({'status': 'error', 'data': {'message': 'Invalid credentials'}}, status=400)
-        except Exception as e:
-            return Response({'status': 'error', 'data': {'message': str(e)}}, status=400)
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        user = authenticate(username=username, password=password)
+        if user:
+            # 生成JWT令牌（如果使用JWT认证）
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'user_id': user.id,
+                'username': user.username
+            })
+        return Response({
+            'error': 'Invalid credentials'
+        }, status=status.HTTP_401_UNAUTHORIZED)
 # 自定义登出视图
 class CustomLogoutView(APIView):
     @method_decorator(login_required)

@@ -30,6 +30,7 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+# 添加到INSTALLED_APPS
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -37,16 +38,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'education',  # 新增：注册 education 应用
-    'rest_framework',
-    'rest_framework_simplejwt',
+    'education',  # 你的应用
+    'rest_framework',  # 确保只出现一次
+    'corsheaders',  # 新增的CORS支持
+    # 移除其他重复的'rest_framework'条目
 ]
 
+# 添加到MIDDLEWARE（需放在CommonMiddleware之前）
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # CORS中间件
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',  # 添加会话中间件
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -155,8 +158,28 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = '/student_list/'  # Redirect after login
 LOGIN_URL = 'education:login'  # New: Custom login URL name
 
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),  # As configured earlier
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=14),
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 }
+
+
+# 配置CORS允许源（开发环境）
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8081",  # Vue默认开发端口
+    "http://192.168.100.25:8081",
+]
+
+# 可选：允许所有源（生产环境不推荐）
+# CORS_ALLOW_ALL_ORIGINS = True

@@ -4,15 +4,17 @@ from django.contrib.auth.models import User
 from .models import Student
 from .models import Role
 from .models import Permission
+from django.contrib.auth.hashers import make_password
 
 
 class StudentForm(forms.ModelForm):
     class Meta:
         model = Student
-        # 包含 roles 字段并使用多选复选框
-        fields = ['name', 'gender', 'email', 'mobile', 'roles']
+        # 移除 password 字段
+        fields = ['name', 'gender', 'email', 'mobile', 'roles']  # 删除 'password'
         widgets = {
-            'roles': forms.CheckboxSelectMultiple(),  # 多选小部件
+            'roles': forms.CheckboxSelectMultiple(),
+            # 移除 password 相关 widgets 配置
         }
 
     def __init__(self, *args, is_admin=False, **kwargs):
@@ -126,3 +128,12 @@ class PasswordChangeForm(forms.Form):
         if new_password != confirm_password:
             raise forms.ValidationError('新密码与确认密码不一致')
         return cleaned_data
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        # 密码哈希处理
+        if self.cleaned_data.get('password'):
+            instance.password = make_password(self.cleaned_data['password'])
+        if commit:
+            instance.save()
+        return instance

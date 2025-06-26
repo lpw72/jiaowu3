@@ -21,7 +21,7 @@ urlpatterns = [
 
     # 注册、登录、登出路由
     path('api/register/', register, name='register'),  # 用户注册
-    path('api/login/', CustomLoginView.as_view(), name='login'),  # 用户登录
+    path('api/login/', CustomLoginView.as_view(), name='login'),  # 确保使用API视图
     path('api/logout/', CustomLogoutView.as_view(), name='logout'),  # 用户登出
 
     # 角色相关路由

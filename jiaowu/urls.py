@@ -28,7 +28,6 @@ urlpatterns = [
     path('', RedirectView.as_view(pattern_name='student-list'), name='root'),
     # 包含教育应用的所有路由
     path('', include('education.urls')),
-    # 保留JWT相关路由（注意：教育应用中也有重复定义，建议后续清理）
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
