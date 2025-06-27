@@ -1,4 +1,59 @@
 from django import forms
+from django.contrib.auth.models import User
+from .models import Student, Role
+from django.contrib.auth.forms import UserCreationForm
+
+
+class StudentForm(forms.ModelForm):
+    class Meta:
+        model = Student
+        # 移除 password 字段
+        fields = ['name', 'gender', 'email', 'mobile', 'roles']  # 删除 'password'
+        widgets = {
+            'roles': forms.CheckboxSelectMultiple(),
+            # 移除 password 相关 widgets 配置
+        }
+
+    def __init__(self, *args, is_admin=False, **kwargs):
+        super().__init__(*args, **kwargs)
+        # 非管理员用户隐藏 roles 字段
+        if not is_admin:
+            del self.fields['roles']
+
+
+class StudentRegistrationForm(UserCreationForm):
+    email = forms.EmailField(required=True, label='邮箱')
+    # Move student-specific fields here as form-only fields
+    gender = forms.ChoiceField(choices=Student.GENDER_CHOICES, label='性别')
+    # Make mobile field optional to match Student model's blank=True
+    mobile = forms.CharField(max_length=11, label='电话', required=False)
+    roles = forms.ModelMultipleChoiceField(
+        queryset=Role.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        label='角色选择',
+        required=False  # Add this to make roles optional
+    )
+
+    class Meta:
+        model = User
+        # Only include User model fields in Meta.fields
+        fields = ['username', 'email', 'password1', 'password2']  # Remove gender, mobile, roles
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data['email']
+        if commit:
+            user.save()
+            # Create Student instance with form data
+            student = Student.objects.create(
+                name=self.cleaned_data['username'],
+                gender=self.cleaned_data['gender'],
+                email=self.cleaned_data['email'],
+                mobile=self.cleaned_data['mobile'],
+                user=user
+            )
+            student.roles.set(self.cleaned_data['roles'])
+        return user
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from .models import Student

@@ -11,7 +11,7 @@ from rest_framework.permissions import IsAuthenticated,AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from .forms import StudentForm, UserRegistrationForm, PasswordChangeForm,RoleForm,PermissionForm
+from .forms import StudentForm, UserRegistrationForm, PasswordChangeForm, RoleForm, PermissionForm, StudentRegistrationForm
 from .models import Student, Role, Permission
 from .serializers import StudentSerializer, RoleSerializer, PermissionSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -31,26 +31,36 @@ def student_list(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def student_update(request, pk):
-    student = get_object_or_404(Student, pk=pk)  # 根据主键获取学生对象，如果不存在则返回404错误
-    current_user = request.user  # 获取当前用户
-    is_admin = hasattr(current_user, 'student') and current_user.student.roles.filter(name__icontains='管理员').exists()  # 检查用户是否为管理员
-    if request.method == 'PUT':  # 如果请求方法是PUT
-        form = StudentForm(request.data, instance=student, is_admin=is_admin)  # 使用表单处理请求数据，并绑定到现有学生实例
-        if form.is_valid():  # 如果表单有效
-            form.save()  # 保存表单数据
-            return Response({'status': 'success', 'data': {'message': 'Student updated successfully'}})  # 返回成功的JSON响应
-        else:
-            return Response({'status': 'error', 'data': {'errors': form.errors}}, status=400)  # 返回包含错误信息的JSON响应
-    else:
-        data = {
-            'id': student.id,
-            'name': student.name,
-            'gender': student.gender,
-            'mobile': student.mobile,
-            'email': student.email,
-            'is_admin': is_admin
-        }
-        return Response({'status': 'success', 'data': data})  # 返回学生信息的JSON响应
+    student = get_object_or_404(Student, pk=pk)
+    current_user = request.user
+    is_admin = hasattr(current_user, 'student') and current_user.student.roles.filter(name__icontains='管理员').exists()
+    
+    if request.method == 'PUT':
+        # 直接从请求数据更新学生模型字段
+        student.name = request.data.get('name', student.name)
+        student.gender = request.data.get('gender', student.gender)
+        student.mobile = request.data.get('mobile', student.mobile)
+        student.email = request.data.get('email', student.email)
+        student.save()
+        
+        # 添加角色更新逻辑
+        if 'roles' in request.data:
+            roles = Role.objects.filter(id__in=request.data.get('roles', []))
+            student.roles.set(roles)
+        
+        return Response({'status': 'success', 'data': {'message': '学生信息更新成功'}})
+    
+    # GET请求处理逻辑
+    data = {
+        'id': student.id,
+        'name': student.name,
+        'gender': student.gender,
+        'mobile': student.mobile,
+        'email': student.email,
+        'is_admin': is_admin,
+        'roles': [role.id for role in student.roles.all()]
+    }
+    return Response({'status': 'success', 'data': data})
 
 # 创建新学生视图
 @api_view(['POST'])
@@ -59,13 +69,17 @@ def student_create(request):
     current_user = request.user
     is_admin = hasattr(current_user, 'student') and current_user.student.roles.filter(name='管理员').exists()
     
+    if not is_admin:
+        return Response({'status': 'error', 'data': {'message': '无权限创建学生'}}, status=403)
+        
     if request.method == 'POST':
-        form = StudentForm(request.data, is_admin=is_admin)
+        form = StudentRegistrationForm(request.data)
         if form.is_valid():
-            student = form.save(commit=False)
-            # 确保密码已正确哈希处理（由表单的save方法处理）
-            student.save()
-            return Response({'status': 'success', 'data': {'message': '学生创建成功'}})
+            user = form.save()
+            return Response({
+                'status': 'success', 
+                'data': {'message': '学生创建成功', 'username': user.username}
+            })
         else:
             return Response({'status': 'error', 'data': {'errors': form.errors}}, status=400)
     else:
@@ -75,9 +89,12 @@ def student_create(request):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def student_delete(request, pk):
-    student = get_object_or_404(Student, pk=pk)  # 根据主键获取学生对象，如果不存在则返回404错误
-    student.delete()  # 删除学生对象
-    return Response({'status': 'success', 'data': {'message': 'Student deleted successfully'}})  # 返回成功的JSON响应
+    student = get_object_or_404(Student, pk=pk)
+    # 获取关联的用户对象
+    user = student.user
+    # 删除用户会级联删除关联的学生记录
+    user.delete()
+    return Response({'status': 'success', 'data': {'message': '用户及关联学生记录已删除'}})
 
 # 用户注册视图
 @api_view(['POST'])
