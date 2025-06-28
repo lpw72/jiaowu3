@@ -6,8 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="384cef37-6d0a-4deb-912b-4041df08d44f" name="更改" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/education/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/education/forms.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/education/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/education/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jiaowu/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/jiaowu/settings.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,7 +44,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/python/django/jiaowu2&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/python/直播&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -133,8 +133,8 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Django 服务器.jiaowu3" />
       <item itemvalue="Django 服务器.jiaowu2" />
+      <item itemvalue="Django 服务器.jiaowu3" />
       <item itemvalue="Django 服务器.jiaowu" />
     </list>
   </component>
@@ -169,6 +169,11 @@
       <workItem from="1750510545099" duration="3862000" />
       <workItem from="1750602156162" duration="1979000" />
       <workItem from="1750840306085" duration="17535000" />
+      <workItem from="1751023377948" duration="676000" />
+      <workItem from="1751025591280" duration="1390000" />
+      <workItem from="1751030779625" duration="1002000" />
+      <workItem from="1751033997945" duration="23000" />
+      <workItem from="1751105393630" duration="512000" />
     </task>
     <servers />
   </component>

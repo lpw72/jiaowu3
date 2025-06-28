@@ -177,8 +177,8 @@ REST_FRAMEWORK = {
 
 # 配置CORS允许源（开发环境）
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8081",  # Vue默认开发端口
-    "http://192.168.100.25:8081",
+    "http://localhost:8080",  # Vue默认开发端口
+    "http://192.168.100.25:8080",
 ]
 
 # 可选：允许所有源（生产环境不推荐）

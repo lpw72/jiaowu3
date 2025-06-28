@@ -1,13 +1,11 @@
+# 导入必要的模块和类
 from django.shortcuts import get_object_or_404
-from django.http import JsonResponse
 from django.contrib.auth import login, update_session_auth_hash, authenticate,logout
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.contrib.auth.models import User
 from django.contrib.messages import success
 from django.utils.decorators import method_decorator
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated,AllowAny
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
@@ -24,19 +22,23 @@ def student_list(request):
     students = Student.objects.all()  # 获取所有学生对象
     serializer = StudentSerializer(students, many=True)  # 使用序列化器将学生对象转换为JSON格式
     current_user = request.user  # 获取当前用户
-    is_admin = hasattr(current_user, 'student') and current_user.student.roles.filter(name__icontains='管理员').exists()  # 检查用户是否为管理员
-    return Response({'status': 'success', 'data': {'students': serializer.data, 'is_admin': is_admin}})  # 返回学生列表和管理员状态的JSON响应
+    # 检查用户是否为管理员
+    is_admin = hasattr(current_user, 'student') and current_user.student.roles.filter(name__icontains='管理员').exists()
+    # 返回学生列表和管理员状态的JSON响应
+    return Response({'status': 'success', 'data': {'students': serializer.data, 'is_admin': is_admin}})
 
 # 更新学生信息视图
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def student_update(request, pk):
+    # 根据主键获取学生对象，如果不存在则返回404错误
     student = get_object_or_404(Student, pk=pk)
-    current_user = request.user
+    current_user = request.user  # 获取当前用户
+    # 检查当前用户是否为管理员
     is_admin = hasattr(current_user, 'student') and current_user.student.roles.filter(name__icontains='管理员').exists()
     
     if request.method == 'PUT':
-        # 直接从请求数据更新学生模型字段
+        # 直接从请求数据更新学生模型字段，如未提供则保留原值
         student.name = request.data.get('name', student.name)
         student.gender = request.data.get('gender', student.gender)
         student.mobile = request.data.get('mobile', student.mobile)
@@ -45,12 +47,14 @@ def student_update(request, pk):
         
         # 添加角色更新逻辑
         if 'roles' in request.data:
+            # 根据请求中的角色ID列表获取角色对象
             roles = Role.objects.filter(id__in=request.data.get('roles', []))
-            student.roles.set(roles)
+            student.roles.set(roles)  # 更新学生的角色关联
         
+        # 返回更新成功的响应
         return Response({'status': 'success', 'data': {'message': '学生信息更新成功'}})
     
-    # GET请求处理逻辑
+    # GET请求处理逻辑：返回学生详细信息
     data = {
         'id': student.id,
         'name': student.name,
@@ -58,59 +62,69 @@ def student_update(request, pk):
         'mobile': student.mobile,
         'email': student.email,
         'is_admin': is_admin,
-        'roles': [role.id for role in student.roles.all()]
+        'roles': [role.id for role in student.roles.all()]  # 获取学生的角色ID列表
     }
-    return Response({'status': 'success', 'data': data})
+    return Response({'status': 'success', 'data': data})  # 返回学生信息的JSON响应
 
 # 创建新学生视图
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def student_create(request):
-    current_user = request.user
+    current_user = request.user  # 获取当前用户
+    # 检查当前用户是否为管理员
     is_admin = hasattr(current_user, 'student') and current_user.student.roles.filter(name='管理员').exists()
     
     if not is_admin:
+        # 如果不是管理员，返回无权限错误
         return Response({'status': 'error', 'data': {'message': '无权限创建学生'}}, status=403)
         
     if request.method == 'POST':
-        form = StudentRegistrationForm(request.data)
+        form = StudentRegistrationForm(request.data)  # 使用学生注册表单处理请求数据
         if form.is_valid():
-            user = form.save()
+            user = form.save()  # 保存用户信息
             return Response({
                 'status': 'success', 
                 'data': {'message': '学生创建成功', 'username': user.username}
             })
         else:
+            # 表单验证失败，返回错误信息
             return Response({'status': 'error', 'data': {'errors': form.errors}}, status=400)
     else:
-        return Response({'status': 'success', 'data': {'is_admin': is_admin}})  # 返回管理员状态的JSON响应
+        # GET请求返回管理员状态
+        return Response({'status': 'success', 'data': {'is_admin': is_admin}})
 
 # 删除学生视图
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def student_delete(request, pk):
+    # 根据主键获取学生对象，如果不存在则返回404错误
     student = get_object_or_404(Student, pk=pk)
     # 获取关联的用户对象
     user = student.user
     # 删除用户会级联删除关联的学生记录
     user.delete()
+    # 返回删除成功的响应
     return Response({'status': 'success', 'data': {'message': '用户及关联学生记录已删除'}})
 
 # 用户注册视图
 @api_view(['POST'])
 def register(request):
     if request.method == 'POST':
-        form = UserRegistrationForm(request.data)
+        form = UserRegistrationForm(request.data)  # 使用用户注册表单处理请求数据
         if form.is_valid():
+            # 获取邀请码
             invitation_code = form.cleaned_data.get('invitation_code', '')
-            user = form.save(commit=False)
-            # 修复：使用 'password1' 代替 'password'
-            user.set_password(form.cleaned_data['password1'])  # 设置密码
+            user = form.save(commit=False)  # 创建用户对象但不保存到数据库
+            # 设置密码（使用password1字段的值）
+            user.set_password(form.cleaned_data['password1'])
+            # 如果邀请码是'123456'，则设置为管理员
             user.is_staff = (invitation_code == '123456')
-            user.save()
+            user.save()  # 保存用户对象到数据库
 
+            # 从表单获取学生信息
             gender = form.cleaned_data['gender']
             mobile = form.cleaned_data['mobile']
+            # 创建学生记录并关联到用户
             student = Student.objects.create(
                 name=user.username,
                 gender=gender,
@@ -119,38 +133,50 @@ def register(request):
                 user=user
             )
 
+            # 获取或创建管理员和普通用户角色
             admin_role, _ = Role.objects.get_or_create(name='管理员')
             common_role, _ = Role.objects.get_or_create(name='普通用户')
 
+            # 根据用户类型分配角色
             if user.is_staff:
                 student.roles.add(admin_role)
             else:
                 student.roles.add(common_role)
 
+            # 添加注册成功消息
             success(request, '注册成功，请使用账号密码登录！')
+            # 返回注册成功响应
             return Response({'status': 'success', 'data': {'message': 'User registered successfully'}})
         else:
+            # 表单验证失败，返回错误信息
             return Response({'status': 'error', 'data': {'errors': form.errors}}, status=400)
     else:
+        # GET请求返回空响应
         return Response({'status': 'success', 'data': {}})
+
 # 自定义登录视图
 class CustomLoginView(APIView):
     def post(self, request):
+        # 从请求数据中获取用户名和密码
         username = request.data.get('username')
         password = request.data.get('password')
+        # 验证用户凭据
         user = authenticate(username=username, password=password)
         if user:
-            # 生成JWT令牌（如果使用JWT认证）
+            # 生成JWT令牌
             refresh = RefreshToken.for_user(user)
+            # 返回令牌和用户信息
             return Response({
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
                 'user_id': user.id,
                 'username': user.username
             })
+        # 验证失败，返回错误信息
         return Response({
             'error': 'Invalid credentials'
         }, status=status.HTTP_401_UNAUTHORIZED)
+
 # 自定义登出视图
 class CustomLogoutView(APIView):
     @method_decorator(login_required)
@@ -164,7 +190,8 @@ class CustomLogoutView(APIView):
 @permission_classes([IsAuthenticated])
 def role_list(request):
     current_user = request.user  # 获取当前用户
-    is_admin = hasattr(current_user, 'student') and current_user.student.roles.filter(name__icontains='管理员').exists()  # 检查用户是否为管理员
+    # 检查用户是否为管理员
+    is_admin = hasattr(current_user, 'student') and current_user.student.roles.filter(name__icontains='管理员').exists()
     roles = Role.objects.all()  # 获取所有角色对象
     serializer = RoleSerializer(roles, many=True)  # 使用序列化器将角色对象转换为JSON格式
     return Response({'status': 'success', 'data': {'roles': serializer.data, 'is_admin': is_admin}})  # 返回角色列表和管理员状态的JSON响应
@@ -174,7 +201,7 @@ def role_list(request):
 @permission_classes([IsAuthenticated])
 def role_create(request):
     if request.method == 'POST':  # 如果请求方法是POST
-        form = RoleForm(request.data)  # 使用表单处理请求数据
+        form = RoleForm(request.data)  # 使用角色表单处理请求数据
         if form.is_valid():  # 如果表单有效
             form.save()  # 保存表单数据
             return Response({'status': 'success', 'data': {'message': 'Role created successfully'}})  # 返回成功的JSON响应
@@ -302,5 +329,3 @@ def student_detail(request):
     student = current_user.student  # 获取用户关联的学生对象
     serializer = StudentSerializer(student)  # 使用序列化器将学生对象转换为JSON格式
     return Response({'status': 'success', 'data': serializer.data})  # 返回学生信息的JSON响应
-
-
