@@ -6,7 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="384cef37-6d0a-4deb-912b-4041df08d44f" name="更改" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/education/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/education/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/education/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/education/forms.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/jiaowu/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/jiaowu/settings.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -174,6 +174,17 @@
       <workItem from="1751030779625" duration="1002000" />
       <workItem from="1751033997945" duration="23000" />
       <workItem from="1751105393630" duration="512000" />
+      <workItem from="1751109324030" duration="10000" />
+      <workItem from="1751163869050" duration="987000" />
+      <workItem from="1751180240543" duration="942000" />
+      <workItem from="1751204156144" duration="3010000" />
+      <workItem from="1751245487403" duration="14000" />
+      <workItem from="1751286969817" duration="4686000" />
+      <workItem from="1751422028566" duration="2226000" />
+      <workItem from="1751458692712" duration="611000" />
+      <workItem from="1751612865599" duration="1812000" />
+      <workItem from="1751641623015" duration="695000" />
+      <workItem from="1751676991235" duration="13000" />
     </task>
     <servers />
   </component>

@@ -39,24 +39,24 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'education',  # 你的应用
-    'rest_framework',  # 确保只出现一次
+    'rest_framework',  #插件，构建Wed api
     'corsheaders',  # 新增的CORS支持
-    # 移除其他重复的'rest_framework'条目
 ]
 
-# 添加到MIDDLEWARE（需放在CommonMiddleware之前）
+# 设置文件的中间件
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',  # CORS中间件
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.common.CommonMiddleware',#通用中间件
+    'django.middleware.csrf.CsrfViewMiddleware',#提供csrf保护的中间件
     'django.contrib.sessions.middleware.SessionMiddleware',  # 添加会话中间件
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',#添加认证中间件
+    'django.contrib.messages.middleware.MessageMiddleware',# 消息中间件
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'jiaowu.urls'
 
+#定义了Django如何加载和渲染模板
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -146,7 +146,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = 'static/'  #存放静态资源
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -154,12 +154,12 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# Add at the bottom of the file
-LOGIN_REDIRECT_URL = '/student_list/'  # Redirect after login
-LOGIN_URL = 'education:login'  # New: Custom login URL name
+
+LOGIN_REDIRECT_URL = '/student_list/'  # 登录后重定向的url
+LOGIN_URL = 'education:login'  # 登录的url
 
 from datetime import timedelta
-
+#设置令牌时间
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),  # As configured earlier
     'REFRESH_TOKEN_LIFETIME': timedelta(days=14),
@@ -167,7 +167,7 @@ SIMPLE_JWT = {
     'SIGNING_KEY': SECRET_KEY,
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
-
+#添加jwt认证
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',

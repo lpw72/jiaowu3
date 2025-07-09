@@ -1,25 +1,10 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
-from .models import Student, Role
-from django.contrib.auth.forms import UserCreationForm
-
-
-class StudentForm(forms.ModelForm):
-    class Meta:
-        model = Student
-        # 移除 password 字段
-        fields = ['name', 'gender', 'email', 'mobile', 'roles']  # 删除 'password'
-        widgets = {
-            'roles': forms.CheckboxSelectMultiple(),
-            # 移除 password 相关 widgets 配置
-        }
-
-    def __init__(self, *args, is_admin=False, **kwargs):
-        super().__init__(*args, **kwargs)
-        # 非管理员用户隐藏 roles 字段
-        if not is_admin:
-            del self.fields['roles']
-
+from .models import Student
+from .models import Role
+from .models import Permission
+from django.contrib.auth.hashers import make_password
 
 class StudentRegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True, label='邮箱')
@@ -54,13 +39,6 @@ class StudentRegistrationForm(UserCreationForm):
             )
             student.roles.set(self.cleaned_data['roles'])
         return user
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth.models import User
-from .models import Student
-from .models import Role
-from .models import Permission
-from django.contrib.auth.hashers import make_password
-
 
 class StudentForm(forms.ModelForm):
     class Meta:
